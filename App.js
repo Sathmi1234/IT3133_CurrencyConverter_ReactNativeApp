@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { StyleSheet, View, TextInput, Button, Text, Picker } from "react-native";
+import { StyleSheet, View, TextInput, Button, Text } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 
 export default function App() {
   const [amount, setAmount] = useState("");
@@ -7,6 +8,9 @@ export default function App() {
   const [toCurrency, setToCurrency] = useState("LKR");
   const [convertedAmount, setConvertedAmount] = useState("");
   const [error, setError] = useState("");
+
+  const [fromCurrencyOpen, setFromCurrencyOpen] = useState(false);
+  const [toCurrencyOpen, setToCurrencyOpen] = useState(false);
 
   const conversionRates = {
     USD: { LKR: 320, EUR: 0.85 },
@@ -25,10 +29,16 @@ export default function App() {
     setConvertedAmount(result.toFixed(2));
   };
 
+  const currencyOptions = [
+    { label: "USD", value: "USD" },
+    { label: "LKR", value: "LKR" },
+    { label: "EUR", value: "EUR" },
+  ];
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Currency Converter</Text>
-      
+
       <Text style={styles.label}>Amount:</Text>
       <TextInput
         style={styles.input}
@@ -37,35 +47,41 @@ export default function App() {
         value={amount}
         onChangeText={setAmount}
       />
-      
+
       <Text style={styles.label}>From Currency:</Text>
-      <Picker
-        selectedValue={fromCurrency}
-        style={styles.picker}
-        onValueChange={(itemValue) => setFromCurrency(itemValue)}
-      >
-        <Picker.Item label="USD" value="USD" />
-        <Picker.Item label="LKR" value="LKR" />
-        <Picker.Item label="EUR" value="EUR" />
-      </Picker>
-      
+      <DropDownPicker
+        open={fromCurrencyOpen}
+        value={fromCurrency}
+        items={currencyOptions}
+        setOpen={setFromCurrencyOpen}
+        setValue={setFromCurrency}
+        setItems={() => {}}
+        style={styles.dropdown}
+        placeholder="Select currency"
+        dropDownContainerStyle={styles.dropdownContainer}
+      />
+
       <Text style={styles.label}>To Currency:</Text>
-      <Picker
-        selectedValue={toCurrency}
-        style={styles.picker}
-        onValueChange={(itemValue) => setToCurrency(itemValue)}
-      >
-        <Picker.Item label="USD" value="USD" />
-        <Picker.Item label="LKR" value="LKR" />
-        <Picker.Item label="EUR" value="EUR" />
-      </Picker>
-      
+      <DropDownPicker
+        open={toCurrencyOpen}
+        value={toCurrency}
+        items={currencyOptions}
+        setOpen={setToCurrencyOpen}
+        setValue={setToCurrency}
+        setItems={() => {}}
+        style={styles.dropdown}
+        placeholder="Select currency"
+        dropDownContainerStyle={styles.dropdownContainer}
+      />
+
       <Button title="Convert" onPress={convertCurrency} />
-      
+
       {convertedAmount ? (
-        <Text style={styles.result}>Converted Amount: {convertedAmount} {toCurrency}</Text>
+        <Text style={styles.result}>
+          Converted Amount: {convertedAmount} {toCurrency}
+        </Text>
       ) : null}
-      
+
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
@@ -96,10 +112,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 10,
   },
-  picker: {
-    height: 40,
-    width: "100%",
+  dropdown: {
     marginBottom: 20,
+    width: "100%",
+    borderColor: "#ccc",
+  },
+  dropdownContainer: {
+    borderColor: "#ccc",
+    zIndex: 1000,
   },
   result: {
     fontSize: 18,
