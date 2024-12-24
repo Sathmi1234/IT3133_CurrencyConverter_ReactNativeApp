@@ -1,9 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet,  View } from 'react-native';
-import { Button, TextInput, Text } from 'react-native-paper';
-import { Picker } from 'react-native-web';
+import React, { useState } from "react";
+import { StyleSheet, View, TextInput, Button, Text, Picker } from "react-native";
 
 export default function App() {
+  const [amount, setAmount] = useState("");
+  const [fromCurrency, setFromCurrency] = useState("USD");
+  const [toCurrency, setToCurrency] = useState("LKR");
+  const [convertedAmount, setConvertedAmount] = useState("");
+  const [error, setError] = useState("");
+
+  const conversionRates = {
+    USD: { LKR: 320, EUR: 0.85 },
+    LKR: { USD: 0.0031, EUR: 0.0026 },
+    EUR: { USD: 1.18, LKR: 380 },
+  };
+
+  const convertCurrency = () => {
+    if (!amount || isNaN(amount)) {
+      setError("Please enter a valid amount");
+      return;
+    }
+    setError("");
+    const rate = conversionRates[fromCurrency][toCurrency];
+    const result = parseFloat(amount) * rate;
+    setConvertedAmount(result.toFixed(2));
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Currency Converter</Text>
@@ -13,11 +34,15 @@ export default function App() {
         style={styles.input}
         placeholder="Enter amount"
         keyboardType="numeric"
+        value={amount}
+        onChangeText={setAmount}
       />
       
       <Text style={styles.label}>From Currency:</Text>
       <Picker
+        selectedValue={fromCurrency}
         style={styles.picker}
+        onValueChange={(itemValue) => setFromCurrency(itemValue)}
       >
         <Picker.Item label="USD" value="USD" />
         <Picker.Item label="LKR" value="LKR" />
@@ -26,14 +51,22 @@ export default function App() {
       
       <Text style={styles.label}>To Currency:</Text>
       <Picker
+        selectedValue={toCurrency}
         style={styles.picker}
+        onValueChange={(itemValue) => setToCurrency(itemValue)}
       >
         <Picker.Item label="USD" value="USD" />
         <Picker.Item label="LKR" value="LKR" />
         <Picker.Item label="EUR" value="EUR" />
       </Picker>
       
-      <Button title="Convert" />
+      <Button title="Convert" onPress={convertCurrency} />
+      
+      {convertedAmount ? (
+        <Text style={styles.result}>Converted Amount: {convertedAmount} {toCurrency}</Text>
+      ) : null}
+      
+      {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
 }
