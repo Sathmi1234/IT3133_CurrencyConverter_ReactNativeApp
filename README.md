@@ -86,3 +86,4 @@ The main component containing the app's logic and UI.
 ---
 
 ## Output
+![Output](./output.jpg)
